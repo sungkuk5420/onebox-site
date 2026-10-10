@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ONEBOX — AI Inventory for Resellers</title>
+  <meta name="description" content="AI inventory management for sneaker and fashion resellers in Korea. One warehouse ledger across KREAM, POIZON, MUSINSA and SOLDOUT, with AI alerts that catch double-selling before it costs you a penalty." />
+  <link rel="canonical" href="https://onebox.team/en/" />
+  <link rel="alternate" hreflang="ko" href="https://onebox.team/" />
+  <link rel="alternate" hreflang="en" href="https://onebox.team/en/" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="../site.css" />
+  <style>
+    body { word-break: normal; }
+    .hero { padding: 80px 0 64px; }
+    .hero-grid { grid-template-columns: 1fr; }
+    @media (min-width: 960px) { .hero-grid { grid-template-columns: 6fr 5fr; } }
+    .lead { max-width: 560px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="./" aria-label="ONEBOX home">
+      <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="24" height="24" rx="6" fill="#000"/><path d="M8 11.5 14 8l6 3.5v7L14 22l-6-3.5z" fill="none" stroke="#fee500" stroke-width="2" stroke-linejoin="round"/><path d="M8 11.5l6 3.5 6-3.5M14 15v7" fill="none" stroke="#fee500" stroke-width="2" stroke-linejoin="round"/></svg>
+      ONEBOX
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#product">Product</a>
+      <a href="#ai">AI</a>
+      <a href="#company">Company</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-white btn-sm" href="../" lang="ko" aria-label="한국어 버전">한국어</a>
+      <a class="btn btn-black btn-sm" href="#contact">Contact</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot" aria-hidden="true"></span>AI inventory management for resellers</div>
+        <h1>One warehouse ledger.<br />AI that catches <mark>double-selling</mark> first.</h1>
+        <p class="lead">Korean sneaker and fashion resellers list the same pair on several marketplaces at once. When it sells on one, the listing on the others stays live. ONEBOX keeps a single ledger of what is physically in the warehouse and flags the overlap before the second order arrives.</p>
+        <div class="hero-cta">
+          <a class="btn btn-black" href="#product">See the product</a>
+          <a class="btn btn-white" href="#contact">Contact us</a>
+        </div>
+        <div class="hero-note">Windows · macOS · Web · Same account as NANBA ONE, our seller suite in production</div>
+      </div>
+      <div class="card" style="padding: 28px;">
+        <h3 style="margin-top:0;">At a glance</h3>
+        <ul style="margin:0; padding-left: 18px; color: var(--muted); font-size: 15px; display: grid; gap: 8px;">
+          <li><b style="color: var(--fg);">Who:</b> individual and small-team resellers on KREAM, POIZON, MUSINSA and SOLDOUT (Korea's main resale marketplaces).</li>
+          <li><b style="color: var(--fg);">Problem:</b> one pair, several live listings, one warehouse. A second sale means a cancellation penalty and account trust loss.</li>
+          <li><b style="color: var(--fg);">Product:</b> SKU-level ledger (model code + size), receiving/shipping/adjustment history, stock counts, barcode, Excel import, plus AI alerts and suggested actions.</li>
+          <li><b style="color: var(--fg);">Status:</b> ledger in beta on top of NANBA ONE (v1.33, in production). AI layer built on Anthropic Claude, in beta.</li>
+          <li><b style="color: var(--fg);">Company:</b> ONEKEEP, Seoul. Bootstrapped.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip" aria-label="Connected marketplaces">
+    <div class="wrap">
+      <div class="label">Marketplaces</div>
+      <div class="marquee"><ul>
+        <li>KREAM</li><li>POIZON</li><li>MUSINSA</li><li>SOLDOUT</li><li>29CM</li><li>ELAND</li><li>LOTTE ON</li><li>SSG</li><li>NIKE</li><li>adidas</li>
+        <li aria-hidden="true">KREAM</li><li aria-hidden="true">POIZON</li><li aria-hidden="true">MUSINSA</li><li aria-hidden="true">SOLDOUT</li><li aria-hidden="true">29CM</li><li aria-hidden="true">ELAND</li><li aria-hidden="true">LOTTE ON</li><li aria-hidden="true">SSG</li><li aria-hidden="true">NIKE</li><li aria-hidden="true">adidas</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <section id="product">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Product</p>
+        <h2>Ledger, alerts, marketplace sync</h2>
+        <p>Inventory is not tied to any marketplace. You can register, receive and count stock without logging into any platform. Marketplace listings are a layer on top of the ledger.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>SKU ledger</h3>
+          <p>The unit of stock is model code + size. Quantities are never stored as counters; they are folded from an append-only ledger, so the number on screen always has a traceable history.</p>
+        </div>
+        <div class="card">
+          <h3>Alerts that fit resale</h3>
+          <p>No "low stock" noise (zero stock is normal in resale). Instead: over-exposed (more live listings than units), zero exposure, aging stock, and idle consignment stock at KREAM's warehouse.</p>
+        </div>
+        <div class="card">
+          <h3>Sale detection and delisting</h3>
+          <p>Sales on KREAM are detected about once a minute and posted to the ledger. Delisting the overlapping listing is suggest-first; automatic mode runs only when every safety gate passes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai" class="ai-sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">ONEBOX AI · built on Claude</p>
+        <h2>Rules count the numbers. Claude explains and proposes.</h2>
+        <p>The rule engine decides <em>what</em> is over-exposed. Claude turns that into a plain-language explanation and a recommended action, and reads the messy purchase records resellers actually have. Execution is always approved by a person.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card"><span class="state live">Beta</span><h3>Purchase records → structured SKUs</h3><p>Resellers keep purchase records as spreadsheets, chat messages and photos of invoices. Claude reads them and returns model code, size, quantity and unit cost for review before receiving.</p></div>
+        <div class="card"><span class="state live">Beta</span><h3>Alert explanation and next action</h3><p>Instead of "CW2288-111 / 270 / over by 1", the user sees which channel sold when, and which listing is safest to pull, with the evidence. Suggest only; execute after approval.</p></div>
+        <div class="card"><span class="state">Planned</span><h3>Natural-language inventory questions</h3><p>"How many Dunk Low 270 received last month are still unsold?" Claude translates the question into a ledger query. Quantities always come from the ledger fold, never from the model.</p></div>
+        <div class="card"><span class="state">Planned</span><h3>Product-name normalization</h3><p>The same shoe is named differently on every marketplace. Claude maps variants to one model code so the ledger never shows the same pair as two rows.</p></div>
+      </div>
+      <div class="claude-note">
+        <div>
+          <h3>Why Claude</h3>
+          <p>This is money-bearing data. We need long context for full purchase histories, multimodal input for tables and invoice photos, and a model that says "I don't know" rather than guessing a quantity. Counting stays in the ledger; the model never writes to it.</p>
+        </div>
+        <div>
+          <h3>What the AI does not do</h3>
+          <ul>
+            <li>Estimate quantities or edit the ledger. The ledger is the only producer of stock numbers.</li>
+            <li>Execute irreversible writes (cancel a listing, ship an order) on its own.</li>
+            <li>See marketplace tokens or passwords. Those never leave the user's PC.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="company" class="company" style="background: var(--soft);">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Company</p>
+        <h2>ONEKEEP</h2>
+        <p>A bootstrapped software company in Seoul. We build and operate <a href="https://no1.certi.life/" target="_blank" rel="noopener" style="text-decoration: underline;">NANBA ONE</a>, an integrated desktop and web suite for resellers (price comparison across KREAM/POIZON, MUSINSA ranking and review tools, bidding, consignment and shipping automation). ONEBOX is our second product: inventory and AI on top of that suite.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><small>In production</small><b>NANBA ONE v1.33</b></div>
+        <div class="fact"><small>Platforms</small><b>Windows · macOS · Web · Android</b></div>
+        <div class="fact"><small>Marketplaces</small><b>KREAM · POIZON · MUSINSA · SOLDOUT</b></div>
+        <div class="fact"><small>AI</small><b>Anthropic Claude</b></div>
+      </div>
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="card">
+          <h3>Data principles</h3>
+          <p>Marketplace credentials (tokens, cookies, passwords, OTP codes) are stored only inside the user's desktop app and are never sent to our servers, our database or the AI. The server sends commands to the PC and receives only secret-free responses. Stock quantities are computed from an append-only ledger.</p>
+        </div>
+        <div class="card">
+          <h3>Legal entity</h3>
+          <p>ONEKEEP (원킵) · CEO Yeon Jeong-uk · Business registration 344-38-01412 · E-commerce registration 2025-Seoul Seocho-0726 · 611, 204 Gasan Digital 1-ro, Geumcheon-gu, Seoul, Korea</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="final">
+    <div class="wrap">
+      <p class="kicker">Contact</p>
+      <h2>Partnerships, programs, press</h2>
+      <p>We reply within two business days.</p>
+      <div class="hero-cta">
+        <a class="btn btn-black" href="mailto:contact@onebox.team">contact@onebox.team</a>
+        <a class="btn btn-white" href="https://no1.certi.life/" target="_blank" rel="noopener">NANBA ONE (Korean)</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" style="margin-bottom: 10px;">ONEBOX</div>
+        <p style="margin:0; max-width: 360px;">AI inventory management for resellers, by ONEKEEP.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul><li><a href="#product">Product</a></li><li><a href="#ai">AI</a></li><li><a href="../" lang="ko">한국어 페이지</a></li></ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul><li><a href="#company">About</a></li><li><a href="mailto:contact@onebox.team">contact@onebox.team</a></li><li><a href="../privacy.html">Privacy (KO)</a></li><li><a href="../terms.html">Terms (KO)</a></li></ul>
+      </div>
+    </div>
+    <div class="biz">ONEKEEP · Business registration 344-38-01412 · 611, 204 Gasan Digital 1-ro, Geumcheon-gu, Seoul · +82-10-6628-0377 · Copyright 2026, All rights reserved.</div>
+  </div>
+</footer>
+</body>
+</html>
