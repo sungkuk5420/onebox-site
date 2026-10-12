@@ -1,0 +1,1 @@
+import{_ as n,b as s,c as t,C as o,n as c}from"./index-0193cbea.js";const r={__name:"NBadge",props:{tone:{type:String,default:"keeping"}},setup(e){return(a,d)=>(s(),t("span",{class:c(["n-badge",`n-badge--${e.tone}`])},[o(a.$slots,"default",{},void 0,!0)],2))}},l=n(r,[["__scopeId","data-v-2bc6c2ca"]]);export{l as N};

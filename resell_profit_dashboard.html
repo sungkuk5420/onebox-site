@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넘버원 — 리셀 수익성 분석</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:      #ffffff;
+  --bg:         #f5f6f8;
+  --surface:    #ffffff;
+  --border:     #e4e6ea;
+  --border-mid: #d0d3da;
+  --text-1:     #111318;
+  --text-2:     #525966;
+  --text-3:     #9098a6;
+  --blue:       #2563eb;
+  --blue-light: #eff4ff;
+  --green:      #16a34a;
+  --green-light:#f0fdf4;
+  --red:        #dc2626;
+  --red-light:  #fef2f2;
+  --amber:      #d97706;
+  --amber-light:#fffbeb;
+  --purple:     #7c3aed;
+  --radius-sm:  6px;
+  --radius:     10px;
+  --radius-lg:  14px;
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow:     0 2px 8px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05);
+}
+
+html { font-size: 14px; }
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: 'Noto Sans KR', 'Inter', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LAYOUT ── */
+.app { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--blue); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -0.5px;
+}
+.logo-text { font-size: 14px; font-weight: 700; color: var(--text-1); line-height: 1.2; }
+.logo-sub  { font-size: 11px; color: var(--text-3); }
+
+.sidebar-section { padding: 16px 20px 8px; }
+.sidebar-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.8px;
+  color: var(--text-3); text-transform: uppercase; margin-bottom: 10px;
+}
+
+.field { margin-bottom: 10px; }
+.field label {
+  display: block; font-size: 11px; color: var(--text-2);
+  margin-bottom: 4px; font-weight: 500;
+}
+.field-row {
+  display: flex; align-items: center;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.field-row:focus-within { border-color: var(--blue); }
+.field-row input {
+  flex: 1; min-width: 0;
+  border: none; background: transparent;
+  padding: 7px 10px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-1);
+  outline: none;
+}
+.field-unit {
+  padding: 0 9px; font-size: 11px; color: var(--text-3);
+  white-space: nowrap; border-left: 1px solid var(--border);
+  background: var(--white); height: 100%; display: flex; align-items: center;
+}
+.derived-tag {
+  font-size: 11px; color: var(--blue); margin-top: 3px;
+  font-weight: 500;
+}
+
+.sidebar-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+.btn-reset {
+  margin: 12px 20px 20px;
+  width: calc(100% - 40px);
+  padding: 9px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid);
+  background: var(--white); color: var(--text-2);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all .15s;
+}
+.btn-reset:hover { background: var(--bg); border-color: var(--blue); color: var(--blue); }
+
+/* MAIN */
+.main {
+  flex: 1; min-width: 0;
+  padding: 28px 32px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* PAGE HEADER */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.page-title { font-size: 20px; font-weight: 700; color: var(--text-1); }
+.page-sub   { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+.stamp {
+  font-size: 11px; color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  background: var(--white);
+}
+
+/* KPI ROW */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.kpi-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-bottom: 6px; }
+.kpi-value { font-size: 20px; font-weight: 700; color: var(--text-1); line-height: 1; }
+.kpi-sub   { font-size: 11px; color: var(--text-3); margin-top: 5px; }
+.kpi-card.bep .kpi-value { color: var(--blue); }
+.kpi-card.profit .kpi-value { color: var(--green); }
+.kpi-card.loss   .kpi-value { color: var(--red); }
+
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.card-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.card-meta  { font-size: 11px; color: var(--text-3); }
+.card-body  { padding: 20px; }
+
+/* LEGEND */
+.legend {
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.li {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text-2);
+}
+.li-dot  { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.li-line { width: 18px; height: 2px; flex-shrink: 0; }
+.li-dash { width: 18px; height: 0; border-top: 2px dashed; flex-shrink: 0; }
+
+/* BIG CHART */
+.chart-main { position: relative; width: 100%; height: 340px; }
+.chart-margin { position: relative; width: 100%; height: 200px; }
+.chart-bar { position: relative; width: 100%; height: 240px; }
+
+/* BOTTOM GRID */
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width:900px){ .bottom-grid { grid-template-columns: 1fr; } }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px; }
+thead th {
+  padding: 9px 14px; text-align: right;
+  font-size: 11px; font-weight: 600; color: var(--text-3);
+  background: #fafbfc;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th:first-child { text-align: left; }
+tbody td {
+  padding: 9px 14px; text-align: right;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+}
+tbody td:first-child { text-align: left; font-weight: 600; color: var(--text-1); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #fafbfc; }
+tbody tr.bep-row td { background: var(--blue-light); }
+.badge {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 99px; font-size: 10px; font-weight: 600;
+}
+.b-g { background: var(--green-light); color: var(--green); }
+.b-r { background: var(--red-light);   color: var(--red);   }
+.b-a { background: var(--amber-light); color: var(--amber); }
+.pos { color: var(--green); font-weight: 600; }
+.neg { color: var(--red);   font-weight: 600; }
+.warn{ color: var(--amber); font-weight: 600; }
+.bep-label {
+  display: inline-block; margin-left: 5px;
+  font-size: 10px; color: var(--blue); font-weight: 600;
+  background: var(--blue-light); padding: 1px 5px; border-radius: 3px;
+}
+
+/* COST STACK */
+.cost-stack { display: flex; flex-direction: column; gap: 8px; }
+.cs-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.cs-bar-wrap { flex: 1; height: 8px; background: #f0f1f3; border-radius: 99px; overflow: hidden; }
+.cs-bar-fill { height: 100%; border-radius: 99px; transition: width .4s; }
+.cs-label { font-size: 12px; color: var(--text-2); min-width: 100px; }
+.cs-value { font-size: 12px; font-weight: 600; color: var(--text-1); min-width: 80px; text-align: right; }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar { display: none; }
+  .main { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">N1</div>
+    <div>
+      <div class="logo-text">넘버원</div>
+      <div class="logo-sub">수익성 분석 시뮬레이터</div>
+    </div>
+  </div>
+
+  <!-- 인건비 -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">인건비 설정</div>
+
+    <div class="field">
+      <label>물류담당 기본급</label>
+      <div class="field-row">
+        <input type="number" id="s_log" value="3000000" step="100000" oninput="recalc()">
+        <span class="field-unit">원</span>
+      </div>
+      <div class="derived-tag" id="d_log">실지출: —</div>
+    </div>
+
+    <div class="field">
+      <label>경리 기본급</label>
+      <div class="field-row">
+        <input type="number" id="s_adm" value="3000000" step="100000" oninput="recalc()">
+        <span class="field-unit">원</span>
+      </div>
+      <div class="derived-tag" id="d_adm">실지출: —</div>
+    </div>
+
+    <div class="field">
+      <label>추가인력 급여 (0 = 미포함)</label>
+      <div class="field-row">
+        <input type="number" id="s_ext" value="0" step="100000" oninput="recalc()">
+        <span class="field-unit">원</span>
+      </div>
+      <div class="derived-tag" id="d_ext"></div>
+    </div>
+
+    <div class="field">
+      <label>4대보험 사업주 부담율</label>
+      <div class="field-row">
+        <input type="number" id="ins" value="9.535" step="0.01" oninput="recalc()">
+        <span class="field-unit">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <!-- 고정비 -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">고정비</div>
+
+    <div class="field">
+      <label>임대 · 관리비</label>
+      <div class="field-row">
+        <input type="number" id="rent" value="1500000" step="100000" oninput="recalc()">
+        <span class="field-unit">원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>기타 고정비</label>
+      <div class="field-row">
+        <input type="number" id="ofx" value="0" step="100000" oninput="recalc()">
+        <span class="field-unit">원</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <!-- 마진 -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">마진 · 구간</div>
+
+    <div class="field">
+      <label>원가율 (매출 대비)</label>
+      <div class="field-row">
+        <input type="number" id="cr" value="70" step="0.5" min="1" max="99" oninput="recalc()">
+        <span class="field-unit">%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>변동비율 (배송·수수료)</label>
+      <div class="field-row">
+        <input type="number" id="vr" value="3" step="0.5" min="0" max="30" oninput="recalc()">
+        <span class="field-unit">%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>분석 시작 매출</label>
+      <div class="field-row">
+        <input type="number" id="rs" value="3000" step="500" oninput="recalc()">
+        <span class="field-unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>분석 종료 매출</label>
+      <div class="field-row">
+        <input type="number" id="re" value="30000" step="1000" oninput="recalc()">
+        <span class="field-unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>구간 수</label>
+      <div class="field-row">
+        <input type="number" id="rn" value="12" step="1" min="5" max="20" oninput="recalc()">
+        <span class="field-unit">개</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-reset" onclick="resetAll()">↺ 기본값으로 초기화</button>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">리셀 사업 수익성 분석</div>
+      <div class="page-sub">매출 규모별 손익분기 · 고정비 구조 · 마진율 시뮬레이션</div>
+    </div>
+    <div class="stamp" id="stamp">—</div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- 메인 차트: 매출 vs 총비용 교차 (이중 Y축) -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">매출 vs 총비용 — 손익분기 교차 분석</span>
+      <div class="legend">
+        <span class="li"><span class="li-line" style="background:#2563eb"></span>매출 <span style="font-size:10px;color:#9098a6">(좌·만원)</span></span>
+        <span class="li"><span class="li-line" style="background:#dc2626"></span>총비용 <span style="font-size:10px;color:#9098a6">(좌·만원)</span></span>
+        <span class="li"><span class="li-dash" style="border-color:#d97706"></span>고정비</span>
+        <span class="li"><span class="li-line" style="background:#16a34a"></span>순이익률 <span style="font-size:10px;color:#9098a6">(우·%)</span></span>
+        <span class="li"><span class="li-dot" style="background:rgba(22,163,74,0.18)"></span>흑자구간</span>
+        <span class="li"><span class="li-dot" style="background:rgba(220,38,38,0.1)"></span>적자구간</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div style="position:relative;width:100%;height:360px;">
+        <canvas id="bepChart" role="img" aria-label="좌축 만원 단위 매출·총비용 교차 차트, 우축 퍼센트 단위 순이익률 라인"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하단 그리드 -->
+  <div class="bottom-grid">
+
+    <!-- 마진율 차트 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">매출별 마진율 추이</span>
+        <div class="legend">
+          <span class="li"><span class="li-line" style="background:#16a34a"></span>순이익률</span>
+          <span class="li"><span class="li-dash" style="border-color:#7c3aed"></span>총이익률</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-margin">
+          <canvas id="marginChart" role="img" aria-label="매출 구간별 순이익률과 총이익률 라인 차트"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비용 구조 바 차트 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">매출별 비용 구조 (적층형)</span>
+        <div class="legend">
+          <span class="li"><span class="li-dot" style="background:#6366f1"></span>인건비</span>
+          <span class="li"><span class="li-dot" style="background:#f59e0b"></span>임대·기타</span>
+          <span class="li"><span class="li-dot" style="background:#94a3b8"></span>변동비</span>
+          <span class="li"><span class="li-dot" style="background:#4ade80"></span>순이익</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-bar">
+          <canvas id="stackChart" role="img" aria-label="매출 구간별 비용 구조 적층 막대 차트"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 고정비 구조 + 테이블 -->
+  <div class="bottom-grid">
+
+    <!-- 고정비 구성 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">월 고정비 구성</span>
+        <span class="card-meta" id="totalFixedMeta">합계: —</span>
+      </div>
+      <div class="card-body">
+        <div class="cost-stack" id="costStack"></div>
+      </div>
+    </div>
+
+    <!-- 상세 테이블 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">구간별 손익 상세</span>
+        <span class="card-meta">단위: 만원</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>월 매출</th>
+              <th>총이익</th>
+              <th>총비용</th>
+              <th>순이익</th>
+              <th>순이익률</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+const DEFAULTS = {
+  s_log:3000000, s_adm:3000000, s_ext:0, ins:9.535,
+  rent:1500000, ofx:0,
+  cr:70, vr:3, rs:3000, re:30000, rn:12
+};
+
+function resetAll() {
+  Object.entries(DEFAULTS).forEach(([k,v]) => { const el = document.getElementById(k); if(el) el.value = v; });
+  recalc();
+}
+
+const gv = id => parseFloat(document.getElementById(id).value) || 0;
+
+function laborCost(sal, insRate) {
+  const ins = Math.round(sal * insRate / 100);
+  const ret = Math.round(sal / 12);
+  return sal + ins + ret;
+}
+
+/* ── FORMATTERS ── */
+function fw(n) {
+  const a = Math.abs(n);
+  if (a >= 100_000_000) return (n/100_000_000).toFixed(1) + '억원';
+  if (a >= 10_000)      return Math.round(n/10000).toLocaleString('ko-KR') + '만원';
+  return Math.round(n).toLocaleString('ko-KR') + '원';
+}
+function fm(n) {  // 만원 단위 숫자
+  const a = Math.abs(n);
+  if (a >= 10_000)  return (n/10000).toFixed(1) + '억';
+  return Math.round(n).toLocaleString('ko-KR');
+}
+function fp(n) { return n.toFixed(1) + '%'; }
+function faxis(v) { // 차트 축용
+  const a = Math.abs(v);
+  if (a >= 100_000) return (v/100_000).toFixed(0) + '억만';
+  if (a >= 10_000)  return (v/10_000).toFixed(0) + '억';
+  if (a >= 1_000)   return (v/1_000).toFixed(0) + '천만';
+  return v + '만';
+}
+
+let bepChart = null, marginChart = null, stackChart = null;
+
+function recalc() {
+  const insRate   = gv('ins');
+  const salL      = gv('s_log');
+  const salA      = gv('s_adm');
+  const salE      = gv('s_ext');
+  const rent      = gv('rent');
+  const ofx       = gv('ofx');
+  const cr        = gv('cr');
+  const vr        = gv('vr');
+  const rsM       = Math.max(100, gv('rs'));
+  const reM       = Math.max(rsM + 100, gv('re'));
+  const rn        = Math.min(20, Math.max(5, Math.round(gv('rn'))));
+
+  // 인건비 실지출
+  const labL = laborCost(salL, insRate);
+  const labA = laborCost(salA, insRate);
+  const labE = salE > 0 ? laborCost(salE, insRate) : 0;
+  const totalLabor = labL + labA + labE;
+  const totalFixed = totalLabor + rent + ofx;
+
+  // 파생값 표시
+  document.getElementById('d_log').textContent = '실지출: ' + fw(labL);
+  document.getElementById('d_adm').textContent = '실지출: ' + fw(labA);
+  document.getElementById('d_ext').textContent = salE > 0 ? '실지출: ' + fw(labE) : '';
+
+  // 손익분기
+  const contrib = 1 - cr/100 - vr/100;
+  const bep     = contrib > 0 ? totalFixed / contrib : Infinity;    // 원
+  const bepMan  = bep / 10000;  // 만원
+
+  // 매출 구간 (만원)
+  const step  = (reM - rsM) / (rn - 1);
+  const revsM = Array.from({length: rn}, (_, i) => Math.round(rsM + step * i));
+
+  // 행 계산 (만원 단위)
+  const rows = revsM.map(revM => {
+    const rev     = revM * 10000;
+    const gross   = rev * (1 - cr/100);
+    const varCost = rev * (vr/100);
+    const totalC  = varCost + totalFixed;
+    const net     = gross - varCost - totalFixed;
+    const margin  = (net / rev) * 100;
+    return { revM, gross, varCost, totalC, net, margin, laborRatio: totalLabor/rev*100 };
+  });
+
+  const lastRow = rows[rows.length - 1];
+  const maxRev  = lastRow.revM;
+
+  // stamp
+  document.getElementById('stamp').textContent =
+    `원가율 ${cr}% · 변동비 ${vr}% · 고정비 ${fw(totalFixed)}/월`;
+
+  // ── KPI
+  const kpis = [
+    { label: '손익분기점', value: isFinite(bep) ? fw(bep) : '—', sub: `공헌이익률 ${fp(contrib*100)}`, cls: 'bep' },
+    { label: '월 총 고정비', value: fw(totalFixed), sub: `연간 ${fw(totalFixed*12)}`, cls: '' },
+    { label: '인건비 합계', value: fw(totalLabor), sub: `비중 ${fp(totalLabor/totalFixed*100)}`, cls: '' },
+    { label: `${fw(lastRow.revM*10000)} 매출 시 순이익`, value: fw(lastRow.net), sub: fp(lastRow.margin), cls: lastRow.net >= 0 ? 'profit' : 'loss' },
+    { label: '직원 1인 실지출', value: fw(labL), sub: '4대보험 + 퇴직금 포함', cls: '' },
+    { label: '총이익률 (고정)', value: fp((1-cr/100)*100), sub: `순이익률 최대 ${fp(lastRow.margin)}`, cls: '' },
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.cls}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // ── CHART 1: BEP 교차 차트
+  // 매출선, 총비용선, 고정비선
+  const labelsC  = revsM.map(v => v >= 10000 ? (v/10000).toFixed(1)+'억' : v.toLocaleString('ko-KR')+'만');
+  const revLine  = revsM.map(v => v);          // 만원
+  const costLine = revsM.map(v => {
+    const rev = v * 10000;
+    return (rev*(vr/100) + totalFixed) / 10000;
+  });
+  const fixedLine = revsM.map(() => totalFixed / 10000);
+
+  // 순이익 영역 (양수만): fill between revenue and cost
+  const profitFill = revsM.map((v,i) => ({x: i, y: Math.max(0, revLine[i] - costLine[i])}));
+
+  if (bepChart) bepChart.destroy();
+  bepChart = new Chart(document.getElementById('bepChart'), {
+    type: 'line',
+    data: {
+      labels: labelsC,
+      datasets: [
+        // ── 영역 채우기 (좌축)
+        {
+          label: '_적자채움',
+          data: revsM.map((v, i) => costLine[i] > revLine[i] ? costLine[i] : null),
+          backgroundColor: 'rgba(220,38,38,0.07)',
+          borderColor: 'transparent',
+          fill: { target: { value: 0 } },
+          tension: 0, pointRadius: 0, order: 10,
+          yAxisID: 'yLeft'
+        },
+        {
+          label: '_흑자채움',
+          data: revsM.map((v, i) => revLine[i] >= costLine[i] ? revLine[i] : null),
+          backgroundColor: 'rgba(22,163,74,0.08)',
+          borderColor: 'transparent',
+          fill: { target: 3 },
+          tension: 0, pointRadius: 0, order: 9,
+          yAxisID: 'yLeft'
+        },
+        // ── 고정비 점선 (좌축)
+        {
+          label: '고정비',
+          data: fixedLine,
+          borderColor: '#d97706',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          tension: 0, pointRadius: 0,
+          order: 4,
+          yAxisID: 'yLeft'
+        },
+        // ── 총비용선 (좌축)
+        {
+          label: '총비용',
+          data: costLine,
+          borderColor: '#dc2626',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          tension: 0.05,
+          pointRadius: 0, pointHoverRadius: 5,
+          order: 3,
+          yAxisID: 'yLeft'
+        },
+        // ── 매출선 (좌축)
+        {
+          label: '매출',
+          data: revLine,
+          borderColor: '#2563eb',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          tension: 0,
+          pointRadius: 0, pointHoverRadius: 5,
+          order: 2,
+          yAxisID: 'yLeft'
+        },
+        // ── 순이익률 (우축) ← 이제 별도 스케일에 바인딩
+        {
+          label: '순이익률',
+          data: rows.map(r => parseFloat(r.margin.toFixed(1))),
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22,163,74,0.0)',
+          borderWidth: 2,
+          borderDash: [],
+          tension: 0.3,
+          pointRadius: 3,
+          pointBackgroundColor: '#16a34a',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          fill: false,
+          order: 1,
+          yAxisID: 'yRight'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label.startsWith('_')) return null;
+              const v = ctx.parsed.y;
+              if (v === null) return null;
+              if (ctx.dataset.yAxisID === 'yRight') return `순이익률: ${v.toFixed(1)}%`;
+              const man = v >= 10000
+                ? (v / 10000).toFixed(1) + '억만원'
+                : Math.round(v).toLocaleString('ko-KR') + '만원';
+              return `${ctx.dataset.label}: ${man}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { size: 11 }, color: '#9098a6', maxRotation: 0 }
+        },
+        yLeft: {
+          type: 'linear',
+          position: 'left',
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: {
+            font: { size: 11 }, color: '#2563eb',
+            callback: v => v >= 10000
+              ? (v / 10000).toFixed(0) + '억만'
+              : v >= 1000
+              ? (v / 1000).toFixed(0) + '천만'
+              : v + '만'
+          },
+          title: { display: true, text: '금액 (만원)', color: '#9098a6', font: { size: 10 } }
+        },
+        yRight: {
+          type: 'linear',
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: {
+            font: { size: 11 }, color: '#16a34a',
+            callback: v => v + '%'
+          },
+          title: { display: true, text: '순이익률 (%)', color: '#16a34a', font: { size: 10 } }
+        }
+      }
+    }
+  });
+
+  // ── CHART 2: 마진율 라인
+  const netMargins   = rows.map(r => parseFloat(r.margin.toFixed(1)));
+  const grossMargins = rows.map(() => parseFloat(((1-cr/100)*100).toFixed(1)));
+
+  if (marginChart) marginChart.destroy();
+  marginChart = new Chart(document.getElementById('marginChart'), {
+    type: 'line',
+    data: {
+      labels: labelsC,
+      datasets: [
+        {
+          label: '순이익률',
+          data: netMargins,
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22,163,74,0.07)',
+          fill: true, tension: 0.3,
+          pointRadius: 3, pointBackgroundColor: '#16a34a',
+          borderWidth: 2
+        },
+        {
+          label: '총이익률',
+          data: grossMargins,
+          borderColor: '#7c3aed',
+          backgroundColor: 'transparent',
+          fill: false, tension: 0,
+          pointRadius: 0,
+          borderWidth: 1.5,
+          borderDash: [5, 4]
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } } },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, color: '#9098a6', maxRotation: 0 } },
+        y: {
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { size: 10 }, color: '#9098a6', callback: v => v + '%' }
+        }
+      }
+    }
+  });
+
+  // ── CHART 3: 적층 바 (만원)
+  const laborM = Math.round(totalLabor / 10000);
+  const rentM  = Math.round((rent + ofx) / 10000);
+
+  if (stackChart) stackChart.destroy();
+  stackChart = new Chart(document.getElementById('stackChart'), {
+    type: 'bar',
+    data: {
+      labels: labelsC,
+      datasets: [
+        { label: '인건비', data: rows.map(() => laborM), backgroundColor: '#818cf8', stack: 'a' },
+        { label: '임대·기타', data: rows.map(() => rentM), backgroundColor: '#fbbf24', stack: 'a' },
+        { label: '변동비', data: rows.map(r => Math.round(r.varCost/10000)), backgroundColor: '#94a3b8', stack: 'a' },
+        {
+          label: '순이익',
+          data: rows.map(r => r.net >= 0 ? Math.round(r.net/10000) : 0),
+          backgroundColor: '#4ade80', stack: 'a'
+        },
+        {
+          label: '순손실',
+          data: rows.map(r => r.net < 0 ? Math.round(r.net/10000) : 0),
+          backgroundColor: '#fca5a5', stack: 'a'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${Math.round(ctx.parsed.y).toLocaleString('ko-KR')}만원` } } },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#9098a6', maxRotation: 0 } },
+        y: { stacked: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, color: '#9098a6', callback: v => v >= 10000 ? (v/10000).toFixed(0)+'억만' : v+'만' } }
+      }
+    }
+  });
+
+  // ── 고정비 구성 스택 바
+  const fixedItems = [
+    { label: '물류담당 실지출', value: labL, color: '#6366f1' },
+    { label: '경리 실지출',     value: labA, color: '#818cf8' },
+    ...(labE > 0 ? [{ label: '추가인력 실지출', value: labE, color: '#a5b4fc' }] : []),
+    { label: '임대·관리비',     value: rent, color: '#f59e0b' },
+    ...(ofx > 0  ? [{ label: '기타 고정비',     value: ofx,  color: '#fcd34d' }] : []),
+  ];
+  document.getElementById('totalFixedMeta').textContent = '합계: ' + fw(totalFixed);
+  document.getElementById('costStack').innerHTML = fixedItems.map(it => {
+    const pct = (it.value / totalFixed * 100).toFixed(1);
+    return `
+    <div class="cs-row">
+      <div class="cs-label">${it.label}</div>
+      <div class="cs-bar-wrap">
+        <div class="cs-bar-fill" style="width:${pct}%;background:${it.color}"></div>
+      </div>
+      <div class="cs-value">${fw(it.value)}</div>
+    </div>`;
+  }).join('') + `
+  <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:12px;font-weight:600;color:var(--text-1)">월 고정비 합계</span>
+    <span style="font-size:14px;font-weight:700;color:var(--text-1)">${fw(totalFixed)}</span>
+  </div>`;
+
+  // ── 테이블
+  const stepSize = rn > 1 ? (revsM[1] - revsM[0]) * 10000 : 1;
+  document.getElementById('tbody').innerHTML = rows.map(r => {
+    const isNeg  = r.net < 0;
+    const isWarn = !isNeg && r.net < totalFixed * 0.1;
+    const pc     = isNeg ? 'neg' : isWarn ? 'warn' : 'pos';
+    const badge  = isNeg ? '<span class="badge b-r">적자</span>' :
+                   isWarn ? '<span class="badge b-a">주의</span>' :
+                             '<span class="badge b-g">흑자</span>';
+    const isBEP  = isFinite(bep) && r.revM * 10000 >= bep && (r.revM * 10000 - stepSize) < bep;
+    const bepTag = isBEP ? '<span class="bep-label">BEP</span>' : '';
+    return `<tr class="${isBEP ? 'bep-row' : ''}">
+      <td>${r.revM >= 10000 ? (r.revM/10000).toFixed(1)+'억만원' : r.revM.toLocaleString('ko-KR')+'만원'}${bepTag}</td>
+      <td>${Math.round(r.gross/10000).toLocaleString('ko-KR')}만</td>
+      <td>${Math.round(r.totalC/10000).toLocaleString('ko-KR')}만</td>
+      <td class="${pc}">${Math.round(r.net/10000).toLocaleString('ko-KR')}만</td>
+      <td class="${pc}">${fp(r.margin)}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+recalc();
+</script>
+</body>
+</html>

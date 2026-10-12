@@ -1,0 +1,83 @@
+/* 가로 스크롤 완전 차단 */
+html, 
+html * {
+  max-width: 100% !important;
+}
+
+html {
+  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+}
+
+body {
+  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+#app {
+  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+}
+
+/* Bootstrap 오버라이드 */
+.container-fluid,
+.container {
+  max-width: 100% !important;
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+  overflow-x: hidden !important;
+}
+
+.row {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+/* 모바일에서 row 마진 제거 */
+@media (max-width: 767px) {
+  .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  [class*="col-"] {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+  
+  .container,
+  .container-fluid {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
+/* 모든 섹션 오버플로우 방지 */
+section,
+div[class*="section"],
+.untree_co-section,
+.untree_co-hero {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* 이미지 오버플로우 방지 */
+img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* 절대/고정 위치 요소 제어 */
+[style*="position: absolute"],
+[style*="position: fixed"] {
+  max-width: 100vw !important;
+}
